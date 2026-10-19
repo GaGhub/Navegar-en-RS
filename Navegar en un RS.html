@@ -1,0 +1,786 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Navegar en un RS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una sola columna de lectura (~68ch) con bandas a todo ancho para los diagramas y el simulador; navegación fija arriba. */
+:root{
+  --bg:#f2f6f7; --surface:#ffffff; --ink:#0d2633; --muted:#4a6370; --line:#c8d6dc;
+  --sea:#0f5c7a; --sea-soft:#dcebf0; --accent:#d9501a; --accent-soft:#fbe5da;
+  --port:#c62828; --stbd:#1d8048; --sail:#fdfdfb; --hull:#e9eef0; --water:#bfdbe6; --dead:#f6d5c7;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#07151c; --surface:#0e222b; --ink:#e2edf1; --muted:#93abb6; --line:#23404c;
+  --sea:#5db4d8; --sea-soft:#12323f; --accent:#ff7d42; --accent-soft:#3a2016;
+  --port:#f0605c; --stbd:#4fc482; --sail:#dbe5e9; --hull:#1b3540; --water:#0f3a4b; --dead:#4a2618; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#07151c; --surface:#0e222b; --ink:#e2edf1; --muted:#93abb6; --line:#23404c;
+  --sea:#5db4d8; --sea-soft:#12323f; --accent:#ff7d42; --accent-soft:#3a2016;
+  --port:#f0605c; --stbd:#4fc482; --sail:#dbe5e9; --hull:#1b3540; --water:#0f3a4b; --dead:#4a2618; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.prose{max-width:68ch}
+h1,h2,h3{font-family:var(--f-display);line-height:1.1;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.2rem,6vw,3.8rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:clamp(1.6rem,3.6vw,2.3rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.2rem;font-weight:700}
+p{margin:0}
+.stack{display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-family:var(--f-mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--sea)}
+a{color:var(--sea)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+/* nav */
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;gap:4px;overflow-x:auto;padding-block:8px;scrollbar-width:none}
+nav.top a{flex:none;text-decoration:none;color:var(--ink);font-size:.92rem;padding:6px 12px;border-radius:999px;white-space:nowrap}
+nav.top a:hover{background:var(--sea-soft)}
+
+header.hero{padding-block:48px 28px}
+header.hero .lead{font-size:1.15rem;color:var(--muted);margin-top:14px;max-width:60ch}
+.legend-sides{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.dot{width:10px;height:10px;border-radius:50%}
+
+section{padding-block:44px;border-top:1px solid var(--line)}
+section > .wrap{display:flex;flex-direction:column;gap:22px}
+.note{font-size:.95rem;color:var(--muted)}
+.key{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+
+/* diagrama del barco */
+.diagram{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:820px){.diagram{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px}
+.svgbox{overflow-x:auto}
+.svgbox svg{display:block;width:100%;height:auto;min-width:320px}
+.boat-hull{fill:var(--hull);stroke:var(--ink);stroke-width:2}
+.water{fill:var(--water);opacity:.55}
+.rig{stroke:var(--ink);stroke-width:3;fill:none;stroke-linecap:round}
+.wire{stroke:var(--ink);stroke-width:1.3;fill:none}
+.rope{stroke:var(--accent);stroke-width:1.8;fill:none}
+.sailp{fill:var(--sail);stroke:var(--ink);stroke-width:1.6}
+.foil{fill:var(--ink);opacity:.85}
+.mk circle{fill:var(--sea);stroke:var(--surface);stroke-width:2;cursor:pointer;transition:r .15s}
+.mk text{fill:#fff;font:700 11px var(--f-mono);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.mk.on circle{fill:var(--accent)}
+.mk.ok circle{fill:var(--stbd)}
+.mk.bad circle{fill:var(--port)}
+.mk:focus{outline:none}
+.mk:focus-visible circle{stroke:var(--accent);stroke-width:4}
+.svglabel{fill:var(--ink);font:500 13px var(--f-body)}
+.svgmuted{fill:var(--muted);font:500 12px var(--f-mono)}
+
+.parts-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:.92rem;padding:7px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--sea)}
+.btn[aria-pressed="true"],.btn.primary{background:var(--sea);border-color:var(--sea);color:var(--surface)}
+.partlist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:2px;max-height:430px;overflow:auto}
+.partlist button{all:unset;box-sizing:border-box;display:flex;gap:10px;align-items:baseline;width:100%;padding:6px 8px;border-radius:6px;cursor:pointer}
+.partlist button:hover,.partlist button.on{background:var(--sea-soft)}
+.partlist .n{font:500 .8rem var(--f-mono);color:var(--sea);min-width:2ch;text-align:right}
+.partlist .g{margin-left:auto;font-size:.75rem;color:var(--muted)}
+.detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);min-height:110px}
+.detail h3{color:var(--accent)}
+.examq{font-family:var(--f-display);font-size:1.3rem;font-weight:700}
+.score{font-family:var(--f-mono);font-size:.9rem;color:var(--muted)}
+
+/* tablas */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.95rem;min-width:620px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--f-mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--f-mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.card b{font-family:var(--f-display);font-size:1.05rem}
+
+/* simulador */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:820px){.sim{grid-template-columns:1fr}}
+.sim svg{width:100%;height:auto;max-width:480px;display:block;margin:0 auto}
+.ctrl{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+input[type=range]{width:100%;accent-color:var(--accent)}
+label.lab{font-family:var(--f-mono);font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;justify-content:space-between}
+.readout{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.95rem}
+.readout dt{color:var(--muted);font-family:var(--f-mono);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;padding-top:3px}
+.readout dd{margin:0}
+.rumbo-name{font-family:var(--f-display);font-size:1.8rem;font-weight:800;line-height:1}
+.pill{display:inline-block;font-size:.85rem;padding:3px 10px;border-radius:999px;font-weight:700}
+.pill.good{background:color-mix(in srgb,var(--stbd) 18%,transparent);color:var(--stbd)}
+.pill.warn{background:var(--accent-soft);color:var(--accent)}
+.pill.bad{background:color-mix(in srgb,var(--port) 16%,transparent);color:var(--port)}
+.speed{height:10px;background:var(--sea-soft);border-radius:6px;overflow:hidden}
+.speed i{display:block;height:100%;background:var(--sea);transition:width .25s}
+.check{display:flex;gap:8px;align-items:center;font-size:.95rem}
+
+/* maniobras */
+.steps{counter-reset:s;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:2rem 1fr;gap:10px}
+.steps li::before{content:counter(s);font:700 .9rem var(--f-mono);color:var(--surface);background:var(--sea);width:1.7rem;height:1.7rem;border-radius:50%;display:grid;place-items:center}
+.voice{font-family:var(--f-mono);font-size:.88rem;color:var(--accent)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+details+details{margin-top:10px}
+summary{cursor:pointer;font-family:var(--f-display);font-weight:700;font-size:1.15rem}
+details[open] summary{margin-bottom:12px}
+
+/* test */
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.q .opts{display:grid;gap:6px}
+.q .opts button{text-align:left}
+.q .opts button.right{background:color-mix(in srgb,var(--stbd) 18%,var(--surface));border-color:var(--stbd)}
+.q .opts button.wrong{background:color-mix(in srgb,var(--port) 14%,var(--surface));border-color:var(--port)}
+.q .why{font-size:.92rem;color:var(--muted)}
+#quizScore{font-family:var(--f-display);font-size:1.4rem;font-weight:700}
+
+dl.gloss{display:grid;grid-template-columns:minmax(120px,max-content) 1fr;gap:8px 18px;margin:0}
+dl.gloss dt{font-weight:700}
+dl.gloss dd{margin:0;color:var(--ink)}
+@media (max-width:520px){dl.gloss{grid-template-columns:1fr}dl.gloss dd{margin-bottom:8px}}
+footer{padding-block:32px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth;scroll-padding-top:60px}
+</style>
+
+<nav class="top" aria-label="Secciones">
+  <div class="wrap">
+    <a href="#partes">Partes del barco</a>
+    <a href="#vela">La vela</a>
+    <a href="#viento">Cómo navega</a>
+    <a href="#rumbos">Rumbos</a>
+    <a href="#maniobras">Maniobras</a>
+    <a href="#test">Autoevaluación</a>
+    <a href="#glosario">Glosario</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Guía en el medio natural acuático · Vela ligera</p>
+    <h1>Navegar en un RS</h1>
+    <p class="lead">Material de estudio para conocer cada elemento de un barco de vela de la familia RS, aprender a trimar la vela y navegar en todos los rumbos. El modelo de referencia es el RS Quest, el más habitual en escuelas; casi todo vale igual para el RS Feva y el RS Zest.</p>
+    <div class="legend-sides">
+      <span class="chip"><span class="dot" style="background:var(--port)"></span>Babor: lado izquierdo mirando a proa (luz roja)</span>
+      <span class="chip"><span class="dot" style="background:var(--stbd)"></span>Estribor: lado derecho mirando a proa (luz verde)</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ PARTES ============ -->
+<section id="partes">
+  <div class="wrap">
+    <div class="prose stack">
+      <p class="eyebrow">Bloque 1</p>
+      <h2>Las partes del barco</h2>
+      <p>Un velero ligero se divide en tres grandes grupos: el <b>casco</b> y sus apéndices (lo que flota y lo que va bajo el agua), la <b>jarcia firme</b> (cables fijos que sujetan el mástil) y la <b>jarcia de labor</b> (los cabos que se mueven para manejar las velas). Toca un número del dibujo o un nombre de la lista para ver qué es y para qué sirve.</p>
+    </div>
+
+    <div class="diagram">
+      <div class="panel svgbox">
+        <svg id="boatSvg" viewBox="40 20 660 470" role="img" aria-label="Vista lateral de un RS Quest con sus partes numeradas">
+          <!-- agua -->
+          <path class="water" d="M40 392 Q80 386 120 392 T200 392 T280 392 T360 392 T440 392 T520 392 T600 392 T700 392 V490 H40 Z"/>
+          <!-- orza -->
+          <path class="foil" d="M348 410 L376 410 L372 488 Q362 498 352 488 Z"/>
+          <!-- pala del timón -->
+          <path class="foil" d="M84 366 L104 366 L98 462 Q88 470 80 458 Z"/>
+          <!-- casco -->
+          <path class="boat-hull" d="M88 356 L640 346 Q636 372 612 392 Q560 412 420 414 L200 410 Q120 406 96 398 Z"/>
+          <line x1="88" y1="356" x2="640" y2="346" stroke="var(--ink)" stroke-width="3"/>
+          <!-- bañera (hueco) -->
+          <path d="M150 355 L420 350" stroke="var(--muted)" stroke-width="7" stroke-linecap="round" opacity=".35"/>
+          <!-- herraje de timón y caña -->
+          <line class="rig" x1="94" y1="352" x2="94" y2="370"/>
+          <line class="rig" x1="94" y1="352" x2="172" y2="344"/>
+          <line class="rig" x1="172" y1="344" x2="250" y2="320" style="stroke-width:2"/>
+          <!-- mástil -->
+          <line class="rig" x1="332" y1="350" x2="332" y2="42"/>
+          <!-- estay y obenque -->
+          <line class="wire" x1="332" y1="92" x2="632" y2="346"/>
+          <line class="wire" x1="332" y1="102" x2="316" y2="352"/>
+          <!-- mayor -->
+          <path class="sailp" d="M335 46 Q232 170 118 298 L335 296 Z"/>
+          <!-- sables -->
+          <g stroke="var(--ink)" stroke-width="1.2">
+            <line x1="285" y1="102" x2="262" y2="112"/>
+            <line x1="245" y1="152" x2="214" y2="164"/>
+            <line x1="200" y1="204" x2="166" y2="216"/>
+            <line x1="160" y1="252" x2="130" y2="264"/>
+          </g>
+          <!-- foque -->
+          <path class="sailp" d="M376 128 Q440 200 614 336 L420 322 Q395 230 376 128 Z"/>
+          <!-- catavientos -->
+          <g stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round">
+            <line x1="404" y1="168" x2="392" y2="172"/>
+            <line x1="438" y1="208" x2="426" y2="212"/>
+          </g>
+          <!-- enrollador -->
+          <circle cx="618" cy="340" r="5" fill="var(--ink)"/>
+          <!-- botavara -->
+          <line class="rig" x1="332" y1="300" x2="112" y2="304"/>
+          <!-- contra -->
+          <line class="rope" x1="332" y1="344" x2="270" y2="302"/>
+          <!-- cunningham -->
+          <line class="rope" x1="335" y1="294" x2="342" y2="336"/>
+          <!-- escota de mayor -->
+          <path class="rope" d="M126 304 L130 352"/>
+          <!-- escota de foque -->
+          <path class="rope" d="M420 322 L440 348"/>
+          <!-- pajarín -->
+          <line class="rope" x1="118" y1="298" x2="112" y2="304"/>
+          <!-- rótulos fijos -->
+          <g id="markers"></g>
+        </svg>
+      </div>
+
+      <div class="panel">
+        <div class="parts-tabs" role="group" aria-label="Modo">
+          <button class="btn" id="modeStudy" aria-pressed="true">Estudiar</button>
+          <button class="btn" id="modeExam" aria-pressed="false">Ponerme a prueba</button>
+        </div>
+        <div id="studyBox">
+          <ul class="partlist" id="partList" style="margin-top:12px"></ul>
+          <div class="detail" id="partDetail" aria-live="polite">
+            <h3>Toca una parte</h3>
+            <p class="note">Verás su nombre, su función y algún consejo práctico.</p>
+          </div>
+        </div>
+        <div id="examBox" hidden>
+          <div class="detail" style="border:0;margin:0" aria-live="polite">
+            <p class="eyebrow">Toca en el dibujo</p>
+            <p class="examq" id="examQ">…</p>
+            <p class="note" id="examFb">Busca el número que corresponde.</p>
+            <p class="score" id="examScore">0 aciertos de 0</p>
+            <div class="row"><button class="btn" id="examSkip">Saltar</button><button class="btn" id="examReset">Reiniciar</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Grupo</th><th>Elementos</th><th>Lo esencial</th></tr></thead>
+        <tbody>
+          <tr><td><b>Casco</b></td><td>Proa, popa, espejo, babor, estribor, cubierta, bañera, regala, cajera de orza</td><td>Es el cuerpo del barco. En el RS es de polietileno rotomoldeado: muy resistente a golpes, ideal para escuela.</td></tr>
+          <tr><td><b>Apéndices</b></td><td>Orza, timón (pala, caña, alargador)</td><td>La orza evita que el barco se vaya de lado (abatimiento). El timón lo dirige.</td></tr>
+          <tr><td><b>Jarcia firme</b></td><td>Mástil, estay de proa, obenques</td><td>Cables de acero fijos. No se tocan navegando; se revisan antes de salir.</td></tr>
+          <tr><td><b>Jarcia de labor</b></td><td>Drizas, escotas, contra, cunningham, pajarín, enrollador</td><td>Cabos que se manejan para izar, trimar y dar forma a las velas.</td></tr>
+          <tr><td><b>Velas</b></td><td>Mayor, foque, gennaker (opcional)</td><td>La mayor va en el mástil y la botavara; el foque, a proa del mástil; el gennaker se usa en largos y popas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LA VELA ============ -->
+<section id="vela">
+  <div class="wrap">
+    <div class="prose stack">
+      <p class="eyebrow">Bloque 2</p>
+      <h2>La vela: puños, lados y controles</h2>
+      <p>Toda vela triangular tiene tres <b>puños</b> (esquinas) y tres <b>lados</b>. Aprenderlos es imprescindible porque cada control actúa sobre uno de ellos.</p>
+    </div>
+    <div class="two">
+      <div class="panel svgbox">
+        <svg viewBox="0 0 420 380" role="img" aria-label="Partes de la vela mayor">
+          <path class="sailp" d="M250 30 Q170 170 70 320 L250 318 Z"/>
+          <g stroke="var(--ink)" stroke-width="1.2"><line x1="215" y1="85" x2="195" y2="94"/><line x1="182" y1="140" x2="156" y2="151"/><line x1="146" y1="197" x2="118" y2="208"/><line x1="112" y1="253" x2="86" y2="263"/></g>
+          <rect x="190" y="230" width="40" height="30" rx="3" fill="var(--water)" stroke="var(--ink)" stroke-width="1"/>
+          <line x1="250" y1="20" x2="250" y2="350" stroke="var(--ink)" stroke-width="4"/>
+          <line x1="60" y1="322" x2="256" y2="322" stroke="var(--ink)" stroke-width="4"/>
+          <g fill="var(--accent)"><circle cx="250" cy="30" r="6"/><circle cx="250" cy="318" r="6"/><circle cx="70" cy="320" r="6"/></g>
+          <text class="svglabel" x="262" y="34">Puño de driza</text>
+          <text class="svglabel" x="262" y="314">Puño de amura</text>
+          <text class="svglabel" x="20" y="348">Puño de escota</text>
+          <text class="svglabel" x="262" y="175" style="font-weight:700">Grátil</text>
+          <text class="svgmuted" x="262" y="193">(va en el mástil)</text>
+          <text class="svglabel" x="40" y="150" style="font-weight:700">Baluma</text>
+          <text class="svgmuted" x="20" y="168">(borde de salida)</text>
+          <text class="svglabel" x="130" y="342" style="font-weight:700">Pujamen</text>
+          <text class="svgmuted" x="128" y="360">(sobre la botavara)</text>
+          <text class="svgmuted" x="160" y="226">ventana</text>
+          <text class="svgmuted" x="120" y="128">sables</text>
+          <text class="svgmuted" x="262" y="340">mástil</text>
+        </svg>
+      </div>
+      <div class="stack">
+        <div class="card"><b>Puño de driza</b><span>Esquina superior. Ahí se engancha la driza para izar la vela.</span></div>
+        <div class="card"><b>Puño de amura</b><span>Esquina inferior delantera, junto al mástil. Sobre ella tira el cunningham.</span></div>
+        <div class="card"><b>Puño de escota</b><span>Esquina inferior trasera, al final de la botavara. Sobre ella tira el pajarín.</span></div>
+        <div class="card"><b>Grátil, baluma y pujamen</b><span>Lado delantero, lado trasero y lado inferior. Los sables dan rigidez a la baluma.</span></div>
+      </div>
+    </div>
+
+    <div class="prose stack">
+      <h3>Los controles de la vela</h3>
+      <p>Con tres ideas basta para empezar: la <b>escota</b> regula el ángulo de la vela respecto al viento, los demás controles regulan su <b>forma</b> (más bolsa para potencia, más plana para viento fuerte) y la <b>contra</b> impide que la botavara suba.</p>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Control</th><th>Dónde actúa</th><th>Si cazas (tiras)</th><th>Cuándo</th></tr></thead>
+        <tbody>
+          <tr><td><b>Escota de mayor</b></td><td>Botavara</td><td>La vela se acerca al centro del barco</td><td>Siempre: es el acelerador del barco</td></tr>
+          <tr><td><b>Escotas de foque</b></td><td>Puño de escota del foque</td><td>El foque se cierra. Se caza la de sotavento</td><td>Siempre, coordinada con la mayor</td></tr>
+          <tr><td><b>Contra (trapa)</b></td><td>Entre mástil y botavara</td><td>La botavara no sube y la baluma se tensa</td><td>Más tensa con viento fuerte y en largos</td></tr>
+          <tr><td><b>Cunningham</b></td><td>Puño de amura</td><td>Tensa el grátil y aplana la vela por delante</td><td>Con viento fuerte, para quitar potencia</td></tr>
+          <tr><td><b>Pajarín</b></td><td>Puño de escota de la mayor</td><td>Tensa el pujamen: vela más plana abajo</td><td>Tenso con mucho viento, suelto con poco</td></tr>
+          <tr><td><b>Enrollador de foque</b></td><td>Tambor en la proa</td><td>Enrolla el foque sobre sí mismo</td><td>Para recoger el foque en tierra o con mal tiempo</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two">
+      <div class="card"><b>Cómo leer los catavientos</b>
+        <span>Son hilos de lana en el grátil del foque, uno a cada lado. Si los dos fluyen horizontales hacia atrás, la vela está bien.</span>
+        <span>Cae o gira el de <b>barlovento</b> (el del lado del viento): estás demasiado orzado o la vela muy amollada. <b>Caza</b> o <b>arriba</b> un poco.</span>
+        <span>Cae o gira el de <b>sotavento</b>: estás sobrecazado o arribado. <b>Amolla</b> u <b>orza</b> un poco.</span>
+      </div>
+      <div class="card"><b>La regla de oro del trimado</b>
+        <span>Amolla la escota hasta que el grátil empiece a <b>flamear</b> (a temblar) y luego caza justo lo necesario para que deje de hacerlo.</span>
+        <span>Repite cada vez que cambies de rumbo o role el viento. Una vela un poco abierta corre más que una sobrecazada.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VIENTO ============ -->
+<section id="viento">
+  <div class="wrap">
+    <div class="prose stack">
+      <p class="eyebrow">Bloque 3</p>
+      <h2>Cómo navega un velero</h2>
+      <p>La vela funciona como el ala de un avión puesta de pie: el viento, al recorrerla por las dos caras, crea una <b>fuerza vélica</b> que empuja el barco hacia delante y también de lado. La <b>orza</b> se opone al empuje lateral, así que lo que queda es avance. Por eso un velero puede navegar con el viento de costado e incluso contra él, hasta unos 45°.</p>
+      <p>Hay un sector de unos 90° (45° a cada lado del viento) en el que <b>no se puede navegar</b>: es la <b>zona muerta</b> o <b>zona de no navegación</b>. Para llegar a un punto situado ahí, el barco avanza en zigzag de ceñida, virando de una amura a otra: eso es <b>bordear</b>.</p>
+    </div>
+    <div class="cards">
+      <div class="card"><b>Barlovento y sotavento</b><span>Barlovento es el lado por donde entra el viento; sotavento, el lado hacia donde va. La tripulación se sienta a barlovento para compensar la escora.</span></div>
+      <div class="card"><b>Amura</b><span>Navegamos <b>amurados a babor</b> si el viento entra por babor (la botavara va a estribor) y <b>amurados a estribor</b> si entra por estribor.</span></div>
+      <div class="card"><b>Orzar y arribar</b><span><b>Orzar</b> es acercar la proa al viento. <b>Arribar</b> es alejarla. Con caña: empujar la caña hacia la vela es orzar; tirar de ella hacia ti es arribar.</span></div>
+      <div class="card"><b>Viento real y aparente</b><span>El real es el que sopla en el agua. El aparente es el que siente el barco en marcha, mezcla del real y del de su propio avance. Los catavientos y la grímpola marcan el aparente.</span></div>
+      <div class="card"><b>Escora y equilibrio</b><span>El barco se inclina por el empuje del viento. Se corrige con el peso de la tripulación, amollando escota o aplanando la vela. Un RS rápido navega casi plano.</span></div>
+      <div class="card"><b>Las cinco claves</b><span>Equilibrio lateral, trimado de velas, altura de orza, rumbo y trimado longitudinal (peso adelante o atrás). Revisa las cinco en cada bordo.</span></div>
+    </div>
+    <p class="note">Regla rápida para el timón: el barco gira hacia el lado contrario al que mueves la caña. Caña a sotavento (hacia la vela) = orzar. Caña a barlovento (hacia ti) = arribar.</p>
+  </div>
+</section>
+
+<!-- ============ RUMBOS ============ -->
+<section id="rumbos">
+  <div class="wrap">
+    <div class="prose stack">
+      <p class="eyebrow">Bloque 4 · Simulador</p>
+      <h2>Los rumbos respecto al viento</h2>
+      <p>El <b>rumbo</b> es el ángulo entre la proa y la dirección de donde viene el viento. Mueve el barco con los botones o el deslizador y fíjate cómo cambian la posición de la vela, la orza y la tripulación. Activa “Yo trimo la vela” para practicar el ajuste de escota.</p>
+    </div>
+    <div class="sim">
+      <div class="panel">
+        <svg id="simSvg" viewBox="-262 -228 524 456" role="img" aria-label="Rosa de rumbos con el barco y su vela">
+          <circle r="190" fill="var(--sea-soft)" stroke="var(--line)"/>
+          <path id="deadZone" fill="var(--dead)" opacity=".8"/>
+          <g id="roseLines" stroke="var(--line)" stroke-width="1"></g>
+          <g id="roseLabels"></g>
+          <g id="windArrow">
+            <line x1="0" y1="-222" x2="0" y2="-150" stroke="var(--sea)" stroke-width="4"/>
+            <path d="M-11 -160 L0 -140 L11 -160 Z" fill="var(--sea)"/>
+            <text x="14" y="-200" class="svgmuted" style="fill:var(--sea)">VIENTO</text>
+          </g>
+          <g id="boatTop">
+            <path id="wake" d="M0 60 L0 100" stroke="var(--surface)" stroke-width="4" stroke-dasharray="6 6" opacity=".9"/>
+            <path d="M0 -62 C24 -36 26 22 19 58 L-19 58 C-26 22 -24 -36 0 -62 Z" class="boat-hull"/>
+            <line x1="-5" y1="-4" x2="-5" y2="26" stroke="var(--muted)" stroke-width="3" opacity=".5"/>
+            <path id="jib" class="sailp"/>
+            <path id="main" class="sailp"/>
+            <line id="boom" class="rig" style="stroke-width:3.5"/>
+            <circle cx="0" cy="-20" r="4" fill="var(--ink)"/>
+            <circle id="crew1" r="7" fill="var(--accent)"/>
+            <circle id="crew2" r="7" fill="var(--accent)" opacity=".75"/>
+            <text x="-14" y="-40" style="font:700 10px var(--f-mono);fill:var(--port)">B</text>
+            <text x="8" y="-40" style="font:700 10px var(--f-mono);fill:var(--stbd)">E</text>
+          </g>
+        </svg>
+      </div>
+      <div class="ctrl panel">
+        <div>
+          <p class="eyebrow" id="amuraTxt">Amurado a babor</p>
+          <p class="rumbo-name" id="rumboName">Través</p>
+        </div>
+        <div class="row" role="group" aria-label="Rumbos rápidos" id="quickBtns"></div>
+        <div class="row">
+          <button class="btn" id="btnOrzar">← Orzar 10°</button>
+          <button class="btn" id="btnArribar">Arribar 10° →</button>
+          <button class="btn" id="btnAmura">Cambiar de amura</button>
+        </div>
+        <div>
+          <label class="lab" for="angle"><span>Ángulo al viento</span><span id="angleVal">90°</span></label>
+          <input type="range" id="angle" min="0" max="180" step="1" value="90">
+        </div>
+        <label class="check"><input type="checkbox" id="selfTrim"> Yo trimo la vela</label>
+        <div id="trimBox" hidden>
+          <label class="lab" for="trim"><span>Escota de mayor: cazar ← → amollar</span><span id="trimVal">0°</span></label>
+          <input type="range" id="trim" min="0" max="90" step="1" value="40">
+        </div>
+        <dl class="readout">
+          <dt>Vela</dt><dd id="rSail"></dd>
+          <dt>Trimado</dt><dd id="rTrim"></dd>
+          <dt>Orza</dt><dd id="rBoard"></dd>
+          <dt>Tripulación</dt><dd id="rCrew"></dd>
+          <dt>Velocidad</dt><dd><div class="speed"><i id="rSpeed"></i></div></dd>
+          <dt>Ojo</dt><dd id="rTip"></dd>
+        </dl>
+      </div>
+    </div>
+
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Rumbo</th><th>Ángulo</th><th>Mayor y foque</th><th>Orza</th><th>Tripulación</th></tr></thead>
+        <tbody>
+          <tr><td><b>Proa al viento</b> (zona muerta)</td><td class="num">0–45°</td><td>Flamean, no hay empuje</td><td>—</td><td>El barco se para. Solo se cruza al virar</td></tr>
+          <tr><td><b>Ceñida</b></td><td class="num">≈45°</td><td>Muy cazadas, cerca del eje</td><td>Toda abajo</td><td>A barlovento, un poco adelantada</td></tr>
+          <tr><td><b>Descuartelar</b></td><td class="num">≈60–75°</td><td>Algo amolladas</td><td>3/4 abajo</td><td>A barlovento</td></tr>
+          <tr><td><b>Través</b></td><td class="num">90°</td><td>A medio camino</td><td>Media</td><td>A barlovento, centrada</td></tr>
+          <tr><td><b>Largo</b></td><td class="num">≈120–135°</td><td>Bastante abiertas</td><td>1/4</td><td>Algo retrasada</td></tr>
+          <tr><td><b>Aleta</b></td><td class="num">≈150°</td><td>Muy abiertas</td><td>Casi arriba</td><td>Retrasada, equilibrando</td></tr>
+          <tr><td><b>Popa / empopada</b></td><td class="num">180°</td><td>Mayor a 90°, foque a la banda contraria (orejas de burro)</td><td>Casi arriba, sin sacarla del todo</td><td>Atrás y repartida a ambas bandas</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Los ángulos son orientativos. Un RS Quest ciñe bien a unos 45° del viento real; con olas o poco viento conviene abrirse un poco más para no perder velocidad.</p>
+  </div>
+</section>
+
+<!-- ============ MANIOBRAS ============ -->
+<section id="maniobras">
+  <div class="wrap">
+    <div class="prose stack">
+      <p class="eyebrow">Bloque 5</p>
+      <h2>Maniobras básicas</h2>
+      <p>Las voces son parte de la maniobra: el patrón avisa, la tripulación confirma y solo entonces se ejecuta.</p>
+    </div>
+    <div>
+      <details open>
+        <summary>Virada por avante (cambiar de amura pasando la proa por el viento)</summary>
+        <ol class="steps">
+          <li><div>Coge velocidad en ceñida. Comprueba que no viene nadie por barlovento. <span class="voice">“¿Listos para virar?”</span> <span class="voice">“¡Listos!”</span></div></li>
+          <li><div><span class="voice">“¡Viramos!”</span> Empuja la caña suavemente hacia la vela (orza). No la sueltes de golpe.</div></li>
+          <li><div>Cuando la proa pasa por el viento, la botavara cruza: agáchate y cruza al otro costado mirando a proa, con el alargador por detrás o por delante según tu técnica.</div></li>
+          <li><div>La tripulación suelta la escota de foque del lado antiguo y caza la del nuevo sotavento.</div></li>
+          <li><div>Endereza la caña al llegar a ceñida en la nueva amura, siéntate a barlovento y retrima la mayor.</div></li>
+        </ol>
+      </details>
+      <details>
+        <summary>Trasluchada (cambiar de amura pasando la popa por el viento)</summary>
+        <ol class="steps">
+          <li><div>Arriba hasta una popa franca. Orza casi arriba, contra tensa para que la botavara no se dispare hacia arriba. <span class="voice">“¿Listos para trasluchar?”</span> <span class="voice">“¡Listos!”</span></div></li>
+          <li><div><span class="voice">“¡Trasluchamos!”</span> Tira de la caña hacia ti (arribas un poco más).</div></li>
+          <li><div>Coge la escota de mayor por sus guarnes y acompaña la botavara al otro lado. Cabezas abajo: es la maniobra en la que más golpes hay.</div></li>
+          <li><div>Cambia de costado, centra la caña enseguida para no orzar de golpe y retrima foque y mayor.</div></li>
+        </ol>
+        <p class="note" style="margin-top:12px">Con mucho viento, si no te ves seguro, cambia de amura con una virada por avante dando la vuelta completa (“vaca”).</p>
+      </details>
+      <details>
+        <summary>Parar el barco: posición de seguridad</summary>
+        <ol class="steps">
+          <li><div>Ponte de través o un poco más cerrado (entre ceñida y través).</div></li>
+          <li><div>Amolla por completo las dos escotas: las velas flamean como banderas y el barco se detiene, derivando despacio a sotavento.</div></li>
+          <li><div>Para arrancar, caza el foque primero, después la mayor, y orienta la proa al rumbo que quieras.</div></li>
+        </ol>
+      </details>
+      <details>
+        <summary>Salir desde la playa y volver a ella</summary>
+        <ol class="steps">
+          <li><div>Arma el barco en tierra con la proa al viento: así las velas flamean y el barco no se mueve.</div></li>
+          <li><div>Lleva el barco al agua con orza y timón arriba. Uno sujeta por la proa, el otro sube a bordo.</div></li>
+          <li><div>En cuanto haya fondo, baja timón y orza poco a poco, caza las velas y sal en un rumbo de través o descuartelar.</div></li>
+          <li><div>Al volver, llega despacio, sube la orza al acercarte, desmonta el timón antes de tocar fondo y pon proa al viento para frenar.</div></li>
+        </ol>
+      </details>
+      <details>
+        <summary>Vuelco y adrizado</summary>
+        <ol class="steps">
+          <li><div>Al volcar, comprueba que todos estáis bien y en contacto con el barco. Nunca te alejes nadando del barco.</div></li>
+          <li><div>Amolla las escotas para que las velas no hagan fuerza al subir.</div></li>
+          <li><div>Uno se sube a la orza, cerca del casco, agarrando la escota de foque de barlovento o la regala, y echa el peso hacia atrás.</div></li>
+          <li><div>El otro se tumba en el agua dentro de la bañera, junto al casco (método “cuchara”), y entra en el barco a la vez que se adriza para evitar que vuelva a volcar.</div></li>
+          <li><div>Si el mástil apunta al viento, el barco tiende a volcar de nuevo al adrizar: gira primero el casco para que el mástil quede a sotavento.</div></li>
+        </ol>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEST ============ -->
+<section id="test">
+  <div class="wrap">
+    <div class="prose stack">
+      <p class="eyebrow">Bloque 6</p>
+      <h2>Autoevaluación</h2>
+      <p>Responde y comprueba al instante. Puedes repetir el test cuantas veces quieras; las preguntas se barajan cada vez.</p>
+      <div class="row"><span id="quizScore">0 / 0</span><button class="btn" id="quizReset">Barajar y empezar de nuevo</button></div>
+    </div>
+    <div id="quiz" class="cards" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))"></div>
+  </div>
+</section>
+
+<!-- ============ GLOSARIO ============ -->
+<section id="glosario">
+  <div class="wrap">
+    <div class="prose stack">
+      <p class="eyebrow">Bloque 7</p>
+      <h2>Glosario de a bordo</h2>
+    </div>
+    <dl class="gloss panel">
+      <dt>Abatimiento</dt><dd>Desplazamiento lateral del barco empujado por el viento. La orza lo reduce.</dd>
+      <dt>Adrizar</dt><dd>Poner el barco derecho tras una escora fuerte o un vuelco.</dd>
+      <dt>Amollar</dt><dd>Soltar o dar cabo a una escota; la vela se abre.</dd>
+      <dt>Amura</dt><dd>Costado del barco por el que entra el viento (amurado a babor / a estribor).</dd>
+      <dt>Arribar</dt><dd>Alejar la proa de la dirección del viento.</dd>
+      <dt>Barlovento</dt><dd>Lado por donde viene el viento.</dd>
+      <dt>Bordear</dt><dd>Avanzar en zigzag de ceñida para llegar a un punto situado contra el viento.</dd>
+      <dt>Cazar</dt><dd>Tirar de una escota; la vela se cierra hacia el barco.</dd>
+      <dt>Ceñir</dt><dd>Navegar lo más cerca posible del viento, a unos 45°.</dd>
+      <dt>Escora</dt><dd>Inclinación lateral del barco.</dd>
+      <dt>Flamear</dt><dd>Temblar o gualdrapear la vela por estar demasiado amollada o proa al viento.</dd>
+      <dt>Grímpola</dt><dd>Veleta en el tope del mástil que indica el viento aparente.</dd>
+      <dt>Guarnes</dt><dd>Los tramos de cabo que pasan entre las poleas de un aparejo (por ejemplo, de la escota de mayor).</dd>
+      <dt>Orzar</dt><dd>Acercar la proa a la dirección del viento.</dd>
+      <dt>Rolar</dt><dd>Cambiar el viento de dirección.</dd>
+      <dt>Sotavento</dt><dd>Lado hacia donde va el viento, opuesto a barlovento.</dd>
+      <dt>Trimar</dt><dd>Ajustar velas y peso para que el barco vaya lo más rápido y equilibrado posible.</dd>
+      <dt>Virar</dt><dd>Cambiar de amura. Por avante (proa por el viento) o en redondo / trasluchar (popa por el viento).</dd>
+    </dl>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Material de apoyo para el módulo de Guía en el medio natural acuático. Los ángulos y alturas de orza son orientativos: el barco, el estado de la mar y el viento mandan. Consulta siempre el manual del fabricante para los reglajes concretos de tu modelo RS.</div>
+</footer>
+
+<script>
+(function(){
+/* ---------- Partes ---------- */
+const PARTS=[
+ {n:1,name:"Proa",g:"Casco",x:662,y:338,d:"Parte delantera del barco. Mirando hacia ella, babor queda a la izquierda y estribor a la derecha."},
+ {n:2,name:"Popa y espejo",g:"Casco",x:70,y:372,d:"Parte trasera. El espejo es la tabla plana que cierra la popa; en él van los herrajes del timón (machos y hembras)."},
+ {n:3,name:"Casco",g:"Casco",x:500,y:398,d:"Cuerpo del barco. En la gama RS escuela es de polietileno rotomoldeado, muy resistente. La línea donde toca el agua es la línea de flotación."},
+ {n:4,name:"Bañera",g:"Casco",x:262,y:370,d:"Hueco donde va la tripulación. En el RS Quest es autovaciante: el agua sale sola por popa cuando el barco navega."},
+ {n:5,name:"Cubierta",g:"Casco",x:540,y:364,d:"Superficie superior del casco a proa de la bañera. Su borde exterior es la regala o borda, donde se sienta la tripulación."},
+ {n:6,name:"Orza",g:"Apéndices",x:392,y:452,d:"Plano vertical bajo el casco que evita el abatimiento (que el barco se vaya de lado). Se sube o baja según el rumbo: abajo en ceñida, casi arriba en popa. En el Quest es abatible y gira sobre un eje."},
+ {n:7,name:"Pala del timón",g:"Apéndices",x:62,y:428,d:"Parte del timón que va en el agua y desvía el flujo para girar el barco. Es basculante: se levanta para entrar y salir de la playa."},
+ {n:8,name:"Caña",g:"Apéndices",x:150,y:332,d:"Brazo unido a la pala. Moverla hacia la vela hace orzar; moverla hacia ti hace arribar."},
+ {n:9,name:"Alargador (stick)",g:"Apéndices",x:236,y:342,d:"Extensión articulada de la caña que permite gobernar sentado en la regala, a barlovento."},
+ {n:10,name:"Mástil",g:"Jarcia firme",x:350,y:210,d:"Palo vertical que sostiene las velas. Va encajado en la carlinga de la cubierta y sujeto por el estay y los obenques."},
+ {n:11,name:"Estay de proa",g:"Jarcia firme",x:482,y:218,d:"Cable de acero que sujeta el mástil hacia proa. El grátil del foque va a lo largo del estay."},
+ {n:12,name:"Obenque",g:"Jarcia firme",x:318,y:262,d:"Cables laterales, uno por banda, que sujetan el mástil hacia los costados. Se fijan a las cadenas en la regala."},
+ {n:13,name:"Tope y drizas",g:"Jarcia de labor",x:350,y:46,d:"En el tope del mástil están las roldanas de las drizas: los cabos que sirven para izar la mayor y el foque."},
+ {n:14,name:"Vela mayor",g:"Velas",x:262,y:228,d:"Vela principal, envergada en el mástil y la botavara. Es la que más potencia aporta y la que más se trima."},
+ {n:15,name:"Sables",g:"Velas",x:196,y:150,d:"Varillas metidas en bolsillos de la mayor. Mantienen la forma de la baluma para que no se doble hacia sotavento."},
+ {n:16,name:"Foque",g:"Velas",x:470,y:282,d:"Vela de proa, delante del mástil. Acelera el aire sobre la mayor y ayuda a girar la proa. En el RS Quest es enrollable."},
+ {n:17,name:"Catavientos",g:"Velas",x:420,y:170,d:"Hilos en el grátil del foque (y a veces en la baluma de la mayor) que muestran cómo fluye el aire. Indican si la vela está bien trimada."},
+ {n:18,name:"Enrollador",g:"Jarcia de labor",x:612,y:316,d:"Tambor en el puño de amura del foque. Tirando de su cabo, el foque se enrolla sobre sí mismo para recogerlo."},
+ {n:19,name:"Botavara",g:"Jarcia firme",x:206,y:288,d:"Percha horizontal unida al mástil por el pinzote (articulación). Sujeta el pujamen de la mayor. Cuidado con la cabeza en viradas y trasluchadas."},
+ {n:20,name:"Contra (trapa)",g:"Jarcia de labor",x:284,y:328,d:"Aparejo entre la base del mástil y la botavara que impide que esta suba. Tensa la baluma y controla la potencia, sobre todo en largos."},
+ {n:21,name:"Cunningham",g:"Jarcia de labor",x:360,y:314,d:"Cabo que tira hacia abajo del puño de amura de la mayor. Tensa el grátil y aplana la vela cuando hay mucho viento."},
+ {n:22,name:"Pajarín",g:"Jarcia de labor",x:96,y:290,d:"Cabo que tira del puño de escota de la mayor hacia el extremo de la botavara. Regula la bolsa de la parte baja de la vela."},
+ {n:23,name:"Escota de mayor",g:"Jarcia de labor",x:112,y:332,d:"Cabo con poleas que controla el ángulo de la mayor. Cazar la cierra; amollar la abre. Es el principal control de velocidad."},
+ {n:24,name:"Escota de foque",g:"Jarcia de labor",x:456,y:336,d:"Dos cabos, uno a cada banda, que controlan el foque. Pasan por un escotero (guía) y se trabaja siempre la de sotavento."}
+];
+const svgNS="http://www.w3.org/2000/svg";
+const mkG=document.getElementById('markers');
+const list=document.getElementById('partList');
+const detail=document.getElementById('partDetail');
+const markers={};
+PARTS.forEach(p=>{
+  const g=document.createElementNS(svgNS,'g');
+  g.setAttribute('class','mk');g.setAttribute('tabindex','0');g.setAttribute('role','button');
+  g.setAttribute('aria-label',p.n+'. '+p.name);
+  const c=document.createElementNS(svgNS,'circle');c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('r',11);
+  const t=document.createElementNS(svgNS,'text');t.setAttribute('x',p.x);t.setAttribute('y',p.y);t.textContent=p.n;
+  g.append(c,t);mkG.append(g);markers[p.n]=g;
+  g.addEventListener('click',()=>pick(p.n));
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(p.n)}});
+  const li=document.createElement('li');const b=document.createElement('button');
+  b.innerHTML='<span class="n">'+p.n+'</span><span>'+p.name+'</span><span class="g">'+p.g+'</span>';
+  b.addEventListener('click',()=>pick(p.n));b.dataset.n=p.n;li.append(b);list.append(li);
+});
+let mode='study';
+function showPart(n){
+  const p=PARTS.find(x=>x.n===n);
+  Object.values(markers).forEach(m=>m.classList.remove('on'));markers[n].classList.add('on');
+  list.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.n===n));
+  detail.innerHTML='<p class="eyebrow">'+p.g+'</p><h3>'+p.n+'. '+p.name+'</h3><p>'+p.d+'</p>';
+}
+/* modo examen */
+let order=[],qi=0,hits=0,tries=0,locked=false;
+const examQ=document.getElementById('examQ'),examFb=document.getElementById('examFb'),examScore=document.getElementById('examScore');
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function startExam(){order=shuffle(PARTS.map(p=>p.n));qi=0;hits=0;tries=0;nextQ()}
+function clearMarks(){Object.values(markers).forEach(m=>m.classList.remove('on','ok','bad'))}
+function nextQ(){
+  clearMarks();locked=false;
+  if(qi>=order.length){examQ.textContent='¡Terminado!';examFb.textContent='Has acertado '+hits+' de '+order.length+' partes a la primera.';examScore.textContent='';return}
+  const p=PARTS.find(x=>x.n===order[qi]);
+  examQ.textContent='¿Dónde está: '+p.name.toLowerCase()+'?';examFb.textContent='Pregunta '+(qi+1)+' de '+order.length+'.';
+  examScore.textContent=hits+' aciertos de '+tries;
+}
+function examAnswer(n){
+  if(locked)return;const target=order[qi];tries++;
+  if(n===target){hits++;locked=true;markers[n].classList.add('ok');examFb.textContent='¡Correcto! '+PARTS.find(x=>x.n===n).d;examScore.textContent=hits+' aciertos de '+tries;setTimeout(()=>{qi++;nextQ()},1600)}
+  else{markers[n].classList.add('bad');examFb.textContent='No: el '+n+' es '+PARTS.find(x=>x.n===n).name.toLowerCase()+'. Prueba otra vez.';examScore.textContent=hits+' aciertos de '+tries}
+}
+function pick(n){mode==='study'?showPart(n):examAnswer(n)}
+const bS=document.getElementById('modeStudy'),bE=document.getElementById('modeExam');
+bS.onclick=()=>{mode='study';bS.setAttribute('aria-pressed','true');bE.setAttribute('aria-pressed','false');document.getElementById('studyBox').hidden=false;document.getElementById('examBox').hidden=true;clearMarks()};
+bE.onclick=()=>{mode='exam';bE.setAttribute('aria-pressed','true');bS.setAttribute('aria-pressed','false');document.getElementById('studyBox').hidden=true;document.getElementById('examBox').hidden=false;startExam()};
+document.getElementById('examSkip').onclick=()=>{if(qi<order.length){markers[order[qi]].classList.add('on');examFb.textContent='Era el '+order[qi]+'.';locked=true;setTimeout(()=>{qi++;nextQ()},1300)}};
+document.getElementById('examReset').onclick=startExam;
+showPart(14);
+
+/* ---------- Simulador de rumbos ---------- */
+const rad=d=>d*Math.PI/180;
+const pt=(r,deg)=>[r*Math.sin(rad(deg)),-r*Math.cos(rad(deg))];
+// zona muerta
+(function(){const [x1,y1]=pt(190,-45),[x2,y2]=pt(190,45);document.getElementById('deadZone').setAttribute('d','M0 0 L'+x1+' '+y1+' A190 190 0 0 1 '+x2+' '+y2+' Z')})();
+const RL=document.getElementById('roseLines'),RT=document.getElementById('roseLabels');
+[45,90,135,180,-45,-90,-135].forEach(a=>{const [x,y]=pt(190,a);const l=document.createElementNS(svgNS,'line');l.setAttribute('x1',0);l.setAttribute('y1',0);l.setAttribute('x2',x);l.setAttribute('y2',y);l.setAttribute('stroke-dasharray','3 5');RL.append(l)});
+[[0,'Zona muerta'],[45,'Ceñida'],[90,'Través'],[135,'Largo'],[180,'Popa'],[-45,'Ceñida'],[-90,'Través'],[-135,'Largo']].forEach(([a,txt])=>{
+  const [x,y]=pt(a===0?120:205,a);const t=document.createElementNS(svgNS,'text');
+  t.setAttribute('x',x);t.setAttribute('y',a===180?y-6:y+4);t.setAttribute('text-anchor',a===0||a===180?'middle':(a>0?'start':'end'));
+  t.setAttribute('class','svglabel');t.style.fontWeight='700';t.style.fontSize='12px';t.textContent=txt;
+  if(a===0){t.setAttribute('y',-110)}
+  RT.append(t)});
+const tl=document.createElementNS(svgNS,'text');tl.setAttribute('x',150);tl.setAttribute('y',212);tl.setAttribute('class','svgmuted');tl.setAttribute('text-anchor','middle');tl.textContent='AMURA BABOR';tl.style.fill='var(--port)';RT.append(tl);
+const tr=document.createElementNS(svgNS,'text');tr.setAttribute('x',-150);tr.setAttribute('y',212);tr.setAttribute('class','svgmuted');tr.setAttribute('text-anchor','middle');tr.textContent='AMURA ESTRIBOR';tr.style.fill='var(--stbd)';RT.append(tr);
+
+const S={theta:90,tack:'babor',self:false,trim:40};
+const $=id=>document.getElementById(id);
+function rumbo(t){
+  if(t<42)return{n:'Proa al viento',board:'Abajo. Sin viento en las velas el barco no avanza.',crew:'Centrada. Prepárate para arribar y salir de la zona muerta.',tip:'Estás en la zona muerta: arriba (aleja la proa del viento) hasta que las velas dejen de flamear.'};
+  if(t<56)return{n:'Ceñida',board:'Toda abajo: es cuando más empuje lateral hay.',crew:'Sentada a barlovento, un poco adelantada; haz banda para llevar el barco plano.',tip:'Gobierna mirando los catavientos del foque. Si los dos fluyen, vas a buen ángulo.'};
+  if(t<80)return{n:'Descuartelar',board:'Tres cuartos abajo.',crew:'A barlovento, centrada.',tip:'Un rumbo rápido y cómodo. Amolla un poco desde la ceñida para coger velocidad.'};
+  if(t<101)return{n:'Través',board:'A media altura.',crew:'A barlovento, centrada.',tip:'El viento entra perpendicular al barco. Es el rumbo de la posición de seguridad.'};
+  if(t<141)return{n:'Largo',board:'Un cuarto abajo.',crew:'Algo retrasada para que la proa no se clave.',tip:'El rumbo más rápido. Contra tensa para que la botavara no suba. Buen momento para el gennaker.'};
+  if(t<170)return{n:'Aleta',board:'Casi arriba.',crew:'Retrasada; cambia de banda si el barco escora a barlovento.',tip:'El viento entra por la aleta (el lateral de la popa). Cuidado: cerca de la popa la botavara puede cruzar.'};
+  return{n:'Popa',board:'Casi toda arriba, deja un trozo para mantener el rumbo.',crew:'Atrás y repartida a las dos bandas.',tip:'Riesgo de trasluchada involuntaria. Puedes abrir el foque a la banda contraria: orejas de burro.'};
+}
+function optimal(t){if(t<42)return null;return Math.max(6,Math.min(88,(t-30)/150*86))}
+function speed(t,trimErr){
+  if(t<42)return 0.04;
+  const base=t<56?0.55:t<80?0.78:t<101?0.88:t<141?1:t<170?0.8:0.62;
+  return Math.max(0.08,base*(1-Math.min(Math.abs(trimErr),45)/60));
+}
+function render(){
+  const t=S.theta,side=S.tack==='babor'?1:-1;
+  const opt=optimal(t);
+  if(!S.self){S.trim=opt===null?0:Math.round(opt)}
+  const boomA=t<42?0:S.trim;
+  // estado de trimado
+  let state,cls,err=0;
+  if(opt===null){state='Las velas flamean: no hay empuje.';cls='bad'}
+  else{err=boomA-opt;
+    if(t>=170&&boomA>=80){state='Vela abierta al máximo. Correcto en popa.';cls='good';err=0}
+    else if(err>12){state='Muy amollada: el grátil flamea. Caza escota.';cls='warn'}
+    else if(err<-12){state='Sobrecazada: el barco escora y frena. Amolla escota.';cls='warn'}
+    else{state='Bien trimada: catavientos fluyendo.';cls='good'}}
+  // barco
+  const rot=side*t;
+  $('boatTop').setAttribute('transform','rotate('+rot+')');
+  const L=60,mx=0,my=-20,a=rad(boomA);
+  // si estamos en zona muerta, vela hacia popa ondeando
+  const bx=mx+side*L*Math.sin(a),by=my+L*Math.cos(a);
+  $('boom').setAttribute('x1',mx);$('boom').setAttribute('y1',my);$('boom').setAttribute('x2',bx);$('boom').setAttribute('y2',by);
+  const luff=opt===null||(cls==='warn'&&err>0);
+  const belly=luff?3:(cls==='good'?14:9);
+  const nx=side*Math.cos(a),ny=-Math.sin(a);
+  const cx=(mx+bx)/2+nx*belly,cy=(my+by)/2+ny*belly;
+  $('main').setAttribute('d','M'+mx+' '+my+' Q'+cx.toFixed(1)+' '+cy.toFixed(1)+' '+bx.toFixed(1)+' '+by.toFixed(1)+' Z');
+  $('main').style.strokeDasharray=luff?'4 3':'none';
+  // foque
+  const jb=t<42?0:Math.min(78,boomA*0.85+4),jl=40,jx=0,jy=-60;
+  const jside=(t>=170&&S.self===false)?-side:side; // orejas de burro en popa
+  const ja=rad(jb),jcx=jx+jside*jl*Math.sin(ja),jcy=jy+jl*Math.cos(ja);
+  const jnx=jside*Math.cos(ja),jny=-Math.sin(ja);
+  $('jib').setAttribute('d','M'+jx+' '+jy+' Q'+((jx+jcx)/2+jnx*(luff?2:9)).toFixed(1)+' '+((jy+jcy)/2+jny*(luff?2:9)).toFixed(1)+' '+jcx.toFixed(1)+' '+jcy.toFixed(1)+' Z');
+  $('jib').style.strokeDasharray=luff?'4 3':'none';
+  // tripulación: barlovento = lado contrario a la vela
+  const wind=-side;
+  const cy1=t>=141?24:t<56?4:12;
+  if(t>=170){$('crew1').setAttribute('cx',14);$('crew2').setAttribute('cx',-14)}
+  else{$('crew1').setAttribute('cx',wind*17);$('crew2').setAttribute('cx',wind*15)}
+  $('crew1').setAttribute('cy',cy1+16);$('crew2').setAttribute('cy',cy1);
+  // textos
+  const r=rumbo(t);
+  $('rumboName').textContent=r.n;
+  $('amuraTxt').textContent=t>=170?'Viento por la popa':'Amurado a '+S.tack;
+  $('amuraTxt').style.color=t>=170?'var(--sea)':(S.tack==='babor'?'var(--port)':'var(--stbd)');
+  $('angleVal').textContent=t+'°';$('angle').value=t;
+  $('trim').value=S.trim;$('trimVal').textContent=S.trim+'°';
+  $('rSail').textContent=opt===null?'Flameando, sin forma.':'Botavara a '+boomA+'° del eje'+(S.self?' (ideal ≈ '+Math.round(opt)+'°)':'')+', en la banda de '+(side===1?'estribor':'babor')+'.';
+  $('rTrim').innerHTML='<span class="pill '+cls+'">'+state+'</span>';
+  $('rBoard').textContent=r.board;$('rCrew').textContent=r.crew;$('rTip').textContent=r.tip;
+  $('rSpeed').style.width=Math.round(speed(t,err)*100)+'%';
+  document.querySelectorAll('#quickBtns button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.a===t)));
+}
+[['Ceñida',45],['Descuartelar',65],['Través',90],['Largo',130],['Aleta',155],['Popa',180]].forEach(([n,a])=>{
+  const b=document.createElement('button');b.className='btn';b.textContent=n;b.dataset.a=a;
+  b.onclick=()=>{S.theta=a;render()};$('quickBtns').append(b)});
+$('angle').addEventListener('input',e=>{S.theta=+e.target.value;render()});
+$('btnOrzar').onclick=()=>{S.theta=Math.max(0,S.theta-10);render()};
+$('btnArribar').onclick=()=>{S.theta=Math.min(180,S.theta+10);render()};
+$('btnAmura').onclick=()=>{S.tack=S.tack==='babor'?'estribor':'babor';render()};
+$('selfTrim').addEventListener('change',e=>{S.self=e.target.checked;$('trimBox').hidden=!S.self;if(S.self){S.trim=Math.min(90,S.trim+30)}render()});
+$('trim').addEventListener('input',e=>{S.trim=+e.target.value;render()});
+render();
+
+/* ---------- Test ---------- */
+const Q=[
+ {q:"¿Cómo se llama el lado izquierdo del barco mirando hacia proa?",o:["Estribor","Babor","Barlovento","Sotavento"],a:1,w:"Babor a la izquierda (luz roja), estribor a la derecha (luz verde)."},
+ {q:"¿Qué elemento evita que el barco se desplace de lado?",o:["El timón","La contra","La orza","El cunningham"],a:2,w:"La orza se opone al abatimiento, el desplazamiento lateral."},
+ {q:"Los cables de acero que sujetan el mástil hacia los lados son…",o:["Obenques","Drizas","Escotas","Sables"],a:0,w:"Los obenques forman parte de la jarcia firme junto con el estay."},
+ {q:"¿Para qué sirve la driza?",o:["Para trimar la vela","Para izar la vela","Para subir la orza","Para tensar la baluma"],a:1,w:"La driza iza la vela hasta el tope del mástil."},
+ {q:"La esquina inferior trasera de la mayor es el…",o:["Puño de driza","Puño de amura","Puño de escota","Grátil"],a:2,w:"El puño de escota queda al final de la botavara y sobre él tira el pajarín."},
+ {q:"El borde de la vela que va unido al mástil se llama…",o:["Baluma","Pujamen","Grátil","Sable"],a:2,w:"Grátil: borde de ataque. Baluma: borde de salida. Pujamen: borde inferior."},
+ {q:"¿Qué control impide que la botavara suba?",o:["La contra","El pajarín","La escota de foque","El enrollador"],a:0,w:"La contra (o trapa) tira de la botavara hacia abajo."},
+ {q:"Navegar lo más cerca posible del viento (≈45°) es…",o:["Través","Largo","Ceñida","Popa"],a:2,w:"En ceñida las velas van muy cazadas y la orza toda abajo."},
+ {q:"¿En qué rumbo el viento entra perpendicular al barco?",o:["Ceñida","Través","Aleta","Popa"],a:1,w:"Través: 90° respecto al viento."},
+ {q:"Si el viento entra por estribor, vamos…",o:["Amurados a babor","Amurados a estribor","De popa","En la zona muerta"],a:1,w:"La amura es el costado por el que entra el viento. La botavara irá a babor."},
+ {q:"Empujar la caña hacia la vela hace que el barco…",o:["Arribe","Orce","Se pare","Trasluche"],a:1,w:"Caña hacia la vela (sotavento) = orzar, la proa se acerca al viento."},
+ {q:"En popa, ¿cómo llevamos la orza?",o:["Toda abajo","A media altura","Casi arriba","Da igual"],a:2,w:"En popa casi no hay empuje lateral, así que la orza sube para reducir rozamiento."},
+ {q:"Si el grátil de la vela flamea, debemos…",o:["Cazar escota o arribar","Amollar más","Subir la orza","Soltar la contra"],a:0,w:"Flamear indica vela demasiado abierta para el rumbo: caza o aleja la proa del viento."},
+ {q:"¿Qué maniobra cambia de amura pasando la popa por el viento?",o:["Virada por avante","Trasluchada","Orzada","Posición de seguridad"],a:1,w:"En la trasluchada la botavara cruza con fuerza: cabezas abajo."},
+ {q:"Para parar el barco en el agua de forma segura…",o:["Me pongo en popa y cazo","Me pongo de través y amollo las escotas","Subo la orza del todo","Suelto el timón"],a:1,w:"De través o algo más cerrado, con las escotas sueltas, las velas flamean y el barco se detiene."},
+ {q:"Cae el cataviento de sotavento del foque. ¿Qué haces?",o:["Cazo el foque","Amollo o orzo un poco","Arribo mucho","Nada, está bien"],a:1,w:"Cataviento de sotavento caído: vela sobrecazada o rumbo muy arribado."},
+ {q:"¿Qué es barlovento?",o:["El lado por donde viene el viento","El lado hacia donde va el viento","La parte trasera del barco","Un tipo de vela"],a:0,w:"La tripulación se sienta a barlovento para compensar la escora."},
+ {q:"¿Para qué sirve el cunningham?",o:["Para izar el foque","Para tensar el grátil de la mayor y aplanarla","Para sujetar el timón","Para enrollar el foque"],a:1,w:"Se usa con viento fuerte para quitar potencia a la vela."}
+];
+let correct=0,answered=0;
+function buildQuiz(){
+  const box=$('quiz');box.innerHTML='';correct=0;answered=0;$('quizScore').textContent='0 / '+Q.length;
+  shuffle(Q).forEach((it,i)=>{
+    const d=document.createElement('div');d.className='q';
+    d.innerHTML='<p><b>'+(i+1)+'.</b> '+it.q+'</p>';
+    const opts=document.createElement('div');opts.className='opts';
+    const why=document.createElement('p');why.className='why';why.hidden=true;why.textContent=it.w;
+    it.o.forEach((o,k)=>{const b=document.createElement('button');b.className='btn';b.textContent=o;
+      b.onclick=()=>{if(d.dataset.done)return;d.dataset.done=1;answered++;
+        if(k===it.a){correct++;b.classList.add('right')}else{b.classList.add('wrong');opts.children[it.a].classList.add('right')}
+        why.hidden=false;$('quizScore').textContent=correct+' / '+Q.length+(answered===Q.length?' · '+(correct>=15?'¡Listo para salir al agua!':correct>=11?'Bien, repasa los fallos.':'Repasa los bloques y vuelve a intentarlo.'):'')};
+      opts.append(b)});
+    d.append(opts,why);box.append(d)});
+}
+$('quizReset').onclick=buildQuiz;buildQuiz();
+})();
+</script>
+
+</body></html>
