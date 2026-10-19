@@ -184,7 +184,7 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
     <div class="prose stack">
       <p class="eyebrow">Bloque 1</p>
       <h2>Las partes del barco</h2>
-      <p>Un velero ligero se divide en tres grandes grupos: el <b>casco</b> y sus apéndices (lo que flota y lo que va bajo el agua), la <b>jarcia firme</b> (cables fijos que sujetan el mástil) y la <b>jarcia de labor</b> (los cabos que se mueven para manejar las velas). Toca un número del dibujo o un nombre de la lista para ver qué es y para qué sirve.</p>
+      <p>Un velero ligero se divide en tres grandes grupos: el <b>casco</b> y sus apéndices (lo que flota y lo que va bajo el agua), la <b>arboladura</b> (mástil y botavara) y la <b>jarcia de labor</b> (los cabos que se mueven para manejar las velas). Toca un número del dibujo o un nombre de la lista para ver qué es y para qué sirve.</p>
     </div>
 
     <div class="diagram">
@@ -207,9 +207,8 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
           <line class="rig" x1="172" y1="344" x2="250" y2="320" style="stroke-width:2"/>
           <!-- mástil -->
           <line class="rig" x1="332" y1="350" x2="332" y2="42"/>
-          <!-- estay y obenque -->
+          <!-- estay (sin rotular) -->
           <line class="wire" x1="332" y1="92" x2="632" y2="346"/>
-          <line class="wire" x1="332" y1="102" x2="316" y2="352"/>
           <!-- mayor -->
           <path class="sailp" d="M335 46 Q232 170 118 298 L335 296 Z"/>
           <!-- sables -->
@@ -221,10 +220,13 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
           </g>
           <!-- foque -->
           <path class="sailp" d="M376 128 Q440 200 614 336 L420 322 Q395 230 376 128 Z"/>
-          <!-- catavientos -->
+          <!-- lanitas -->
           <g stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round">
             <line x1="404" y1="168" x2="392" y2="172"/>
             <line x1="438" y1="208" x2="426" y2="212"/>
+            <line x1="262" y1="112" x2="250" y2="118"/>
+            <line x1="214" y1="164" x2="202" y2="170"/>
+            <line x1="166" y1="216" x2="154" y2="222"/>
           </g>
           <!-- enrollador -->
           <circle cx="618" cy="340" r="5" fill="var(--ink)"/>
@@ -232,8 +234,6 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
           <line class="rig" x1="332" y1="300" x2="112" y2="304"/>
           <!-- contra -->
           <line class="rope" x1="332" y1="344" x2="270" y2="302"/>
-          <!-- cunningham -->
-          <line class="rope" x1="335" y1="294" x2="342" y2="336"/>
           <!-- escota de mayor -->
           <path class="rope" d="M126 304 L130 352"/>
           <!-- escota de foque -->
@@ -275,8 +275,8 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
         <tbody>
           <tr><td><b>Casco</b></td><td>Proa, popa, espejo, babor, estribor, cubierta, bañera, regala, cajera de orza</td><td>Es el cuerpo del barco. En el RS es de polietileno rotomoldeado: muy resistente a golpes, ideal para escuela.</td></tr>
           <tr><td><b>Apéndices</b></td><td>Orza, timón (pala, caña, alargador)</td><td>La orza evita que el barco se vaya de lado (abatimiento). El timón lo dirige.</td></tr>
-          <tr><td><b>Jarcia firme</b></td><td>Mástil, estay de proa, obenques</td><td>Cables de acero fijos. No se tocan navegando; se revisan antes de salir.</td></tr>
-          <tr><td><b>Jarcia de labor</b></td><td>Drizas, escotas, contra, cunningham, pajarín, enrollador</td><td>Cabos que se manejan para izar, trimar y dar forma a las velas.</td></tr>
+          <tr><td><b>Arboladura</b></td><td>Mástil, botavara</td><td>Palos y perchas que sostienen las velas. Se revisan antes de salir.</td></tr>
+          <tr><td><b>Jarcia de labor</b></td><td>Drizas, escotas, contra, pajarín, enrollador</td><td>Cabos que se manejan para izar, trimar y dar forma a las velas.</td></tr>
           <tr><td><b>Velas</b></td><td>Mayor, foque, gennaker (opcional)</td><td>La mayor va en el mástil y la botavara; el foque, a proa del mástil; el gennaker se usa en largos y popas.</td></tr>
         </tbody>
       </table>
@@ -317,7 +317,7 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
       </div>
       <div class="stack">
         <div class="card"><b>Puño de driza</b><span>Esquina superior. Ahí se engancha la driza para izar la vela.</span></div>
-        <div class="card"><b>Puño de amura</b><span>Esquina inferior delantera, junto al mástil. Sobre ella tira el cunningham.</span></div>
+        <div class="card"><b>Puño de amura</b><span>Esquina inferior delantera, donde se unen mástil y botavara.</span></div>
         <div class="card"><b>Puño de escota</b><span>Esquina inferior trasera, al final de la botavara. Sobre ella tira el pajarín.</span></div>
         <div class="card"><b>Grátil, baluma y pujamen</b><span>Lado delantero, lado trasero y lado inferior. Los sables dan rigidez a la baluma.</span></div>
       </div>
@@ -334,18 +334,21 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
           <tr><td><b>Escota de mayor</b></td><td>Botavara</td><td>La vela se acerca al centro del barco</td><td>Siempre: es el acelerador del barco</td></tr>
           <tr><td><b>Escotas de foque</b></td><td>Puño de escota del foque</td><td>El foque se cierra. Se caza la de sotavento</td><td>Siempre, coordinada con la mayor</td></tr>
           <tr><td><b>Contra (trapa)</b></td><td>Entre mástil y botavara</td><td>La botavara no sube y la baluma se tensa</td><td>Más tensa con viento fuerte y en largos</td></tr>
-          <tr><td><b>Cunningham</b></td><td>Puño de amura</td><td>Tensa el grátil y aplana la vela por delante</td><td>Con viento fuerte, para quitar potencia</td></tr>
           <tr><td><b>Pajarín</b></td><td>Puño de escota de la mayor</td><td>Tensa el pujamen: vela más plana abajo</td><td>Tenso con mucho viento, suelto con poco</td></tr>
           <tr><td><b>Enrollador de foque</b></td><td>Tambor en la proa</td><td>Enrolla el foque sobre sí mismo</td><td>Para recoger el foque en tierra o con mal tiempo</td></tr>
         </tbody>
       </table>
     </div>
 
+    <div class="prose stack">
+      <h3>Las lanitas (catavientos)</h3>
+      <p>Las lanitas son hilos de lana pegados a la vela que muestran por dónde corre el aire. En un RS hay dos zonas: en el <b>grátil del foque</b>, una lanita por cada cara (la de <b>barlovento</b>, en el lado por donde entra el viento, y la de <b>sotavento</b>, que se ve por transparencia), y en la <b>baluma de la mayor</b>, al final de los sables.</p>
+      <p class="note">Línea continua: lanita de barlovento. Línea discontinua: lanita de sotavento.</p>
+    </div>
+    <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))"><div class="card"><svg viewBox="0 0 190 180" role="img" style="width:100%;max-width:220px;height:auto;display:block;margin:0 auto"><path d="M30 10 Q44 90 40 170 L170 170 Q120 90 30 10 Z" class="sailp"/><line x1="30" y1="10" x2="40" y2="170" stroke="var(--ink)" stroke-width="2.5"/><path d="M43.75 66 q14 -3 28 0 t28 0" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><path d="M43.75 76 q14 -3 28 0 t28 0" fill="none" stroke="var(--sea)" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 4"/><path d="M46.5625 111 q14 -3 28 0 t28 0" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><path d="M46.5625 121 q14 -3 28 0 t28 0" fill="none" stroke="var(--sea)" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 4"/></svg><b>Bien trimado</b><span>Las dos fluyen rectas hacia atrás. Mantén rumbo y escota.</span></div><div class="card"><svg viewBox="0 0 190 180" role="img" style="width:100%;max-width:220px;height:auto;display:block;margin:0 auto"><path d="M30 10 Q44 90 40 170 L170 170 Q120 90 30 10 Z" class="sailp"/><line x1="30" y1="10" x2="40" y2="170" stroke="var(--ink)" stroke-width="2.5"/><path d="M43.75 66 q8 -14 0 -22 q-10 -6 -4 8 q6 12 18 -4" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><path d="M43.75 76 q14 -3 28 0 t28 0" fill="none" stroke="var(--sea)" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 4"/><path d="M46.5625 111 q8 -14 0 -22 q-10 -6 -4 8 q6 12 18 -4" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><path d="M46.5625 121 q14 -3 28 0 t28 0" fill="none" stroke="var(--sea)" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 4"/></svg><b>Gira la de barlovento</b><span>Estás demasiado orzado o la vela va muy amollada. <b>Caza</b> o <b>arriba</b> un poco.</span></div><div class="card"><svg viewBox="0 0 190 180" role="img" style="width:100%;max-width:220px;height:auto;display:block;margin:0 auto"><path d="M30 10 Q44 90 40 170 L170 170 Q120 90 30 10 Z" class="sailp"/><line x1="30" y1="10" x2="40" y2="170" stroke="var(--ink)" stroke-width="2.5"/><path d="M43.75 66 q14 -3 28 0 t28 0" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><path d="M43.75 76 q8 -14 0 -22 q-10 -6 -4 8 q6 12 18 -4" fill="none" stroke="var(--sea)" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 4"/><path d="M46.5625 111 q14 -3 28 0 t28 0" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><path d="M46.5625 121 q8 -14 0 -22 q-10 -6 -4 8 q6 12 18 -4" fill="none" stroke="var(--sea)" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 4"/></svg><b>Gira la de sotavento</b><span>Estás sobrecazado o demasiado arribado. <b>Amolla</b> u <b>orza</b> un poco.</span></div></div>
     <div class="two">
-      <div class="card"><b>Cómo leer los catavientos</b>
-        <span>Son hilos de lana en el grátil del foque, uno a cada lado. Si los dos fluyen horizontales hacia atrás, la vela está bien.</span>
-        <span>Cae o gira el de <b>barlovento</b> (el del lado del viento): estás demasiado orzado o la vela muy amollada. <b>Caza</b> o <b>arriba</b> un poco.</span>
-        <span>Cae o gira el de <b>sotavento</b>: estás sobrecazado o arribado. <b>Amolla</b> u <b>orza</b> un poco.</span>
+      <div class="card"><b>Lanitas de la baluma de la mayor</b>
+        <span>Si fluyen hacia atrás, la mayor está bien. Si se esconden detrás de la vela (hacia sotavento), la mayor está sobrecazada: amolla un poco la escota.</span>
       </div>
       <div class="card"><b>La regla de oro del trimado</b>
         <span>Amolla la escota hasta que el grátil empiece a <b>flamear</b> (a temblar) y luego caza justo lo necesario para que deje de hacerlo.</span>
@@ -368,7 +371,7 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
       <div class="card"><b>Barlovento y sotavento</b><span>Barlovento es el lado por donde entra el viento; sotavento, el lado hacia donde va. La tripulación se sienta a barlovento para compensar la escora.</span></div>
       <div class="card"><b>Amura</b><span>Navegamos <b>amurados a babor</b> si el viento entra por babor (la botavara va a estribor) y <b>amurados a estribor</b> si entra por estribor.</span></div>
       <div class="card"><b>Orzar y arribar</b><span><b>Orzar</b> es acercar la proa al viento. <b>Arribar</b> es alejarla. Con caña: empujar la caña hacia la vela es orzar; tirar de ella hacia ti es arribar.</span></div>
-      <div class="card"><b>Viento real y aparente</b><span>El real es el que sopla en el agua. El aparente es el que siente el barco en marcha, mezcla del real y del de su propio avance. Los catavientos y la grímpola marcan el aparente.</span></div>
+      <div class="card"><b>Viento real y aparente</b><span>El real es el que sopla en el agua. El aparente es el que siente el barco en marcha, mezcla del real y del de su propio avance. Las lanitas y la grímpola marcan el aparente.</span></div>
       <div class="card"><b>Escora y equilibrio</b><span>El barco se inclina por el empuje del viento. Se corrige con el peso de la tripulación, amollando escota o aplanando la vela. Un RS rápido navega casi plano.</span></div>
       <div class="card"><b>Las cinco claves</b><span>Equilibrio lateral, trimado de velas, altura de orza, rumbo y trimado longitudinal (peso adelante o atrás). Revisa las cinco en cada bordo.</span></div>
     </div>
@@ -434,6 +437,7 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
         <dl class="readout">
           <dt>Vela</dt><dd id="rSail"></dd>
           <dt>Trimado</dt><dd id="rTrim"></dd>
+          <dt>Lanitas</dt><dd id="rLan"></dd>
           <dt>Orza</dt><dd id="rBoard"></dd>
           <dt>Tripulación</dt><dd id="rCrew"></dd>
           <dt>Velocidad</dt><dd><div class="speed"><i id="rSpeed"></i></div></dd>
@@ -448,10 +452,8 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
         <tbody>
           <tr><td><b>Proa al viento</b> (zona muerta)</td><td class="num">0–45°</td><td>Flamean, no hay empuje</td><td>—</td><td>El barco se para. Solo se cruza al virar</td></tr>
           <tr><td><b>Ceñida</b></td><td class="num">≈45°</td><td>Muy cazadas, cerca del eje</td><td>Toda abajo</td><td>A barlovento, un poco adelantada</td></tr>
-          <tr><td><b>Descuartelar</b></td><td class="num">≈60–75°</td><td>Algo amolladas</td><td>3/4 abajo</td><td>A barlovento</td></tr>
           <tr><td><b>Través</b></td><td class="num">90°</td><td>A medio camino</td><td>Media</td><td>A barlovento, centrada</td></tr>
-          <tr><td><b>Largo</b></td><td class="num">≈120–135°</td><td>Bastante abiertas</td><td>1/4</td><td>Algo retrasada</td></tr>
-          <tr><td><b>Aleta</b></td><td class="num">≈150°</td><td>Muy abiertas</td><td>Casi arriba</td><td>Retrasada, equilibrando</td></tr>
+          <tr><td><b>Largo</b></td><td class="num">≈110–160°</td><td>Bastante abiertas</td><td>1/4</td><td>Algo retrasada</td></tr>
           <tr><td><b>Popa / empopada</b></td><td class="num">180°</td><td>Mayor a 90°, foque a la banda contraria (orejas de burro)</td><td>Casi arriba, sin sacarla del todo</td><td>Atrás y repartida a ambas bandas</td></tr>
         </tbody>
       </table>
@@ -502,7 +504,7 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
         <ol class="steps">
           <li><div>Arma el barco en tierra con la proa al viento: así las velas flamean y el barco no se mueve.</div></li>
           <li><div>Lleva el barco al agua con orza y timón arriba. Uno sujeta por la proa, el otro sube a bordo.</div></li>
-          <li><div>En cuanto haya fondo, baja timón y orza poco a poco, caza las velas y sal en un rumbo de través o descuartelar.</div></li>
+          <li><div>En cuanto haya fondo, baja timón y orza poco a poco, caza las velas y sal en un rumbo de través.</div></li>
           <li><div>Al volver, llega despacio, sube la orza al acercarte, desmonta el timón antes de tocar fondo y pon proa al viento para frenar.</div></li>
         </ol>
       </details>
@@ -554,6 +556,7 @@ html{scroll-behavior:smooth;scroll-padding-top:60px}
       <dt>Flamear</dt><dd>Temblar o gualdrapear la vela por estar demasiado amollada o proa al viento.</dd>
       <dt>Grímpola</dt><dd>Veleta en el tope del mástil que indica el viento aparente.</dd>
       <dt>Guarnes</dt><dd>Los tramos de cabo que pasan entre las poleas de un aparejo (por ejemplo, de la escota de mayor).</dd>
+      <dt>Lanitas</dt><dd>Hilos de lana en las velas (catavientos) que muestran cómo fluye el aire.</dd>
       <dt>Orzar</dt><dd>Acercar la proa a la dirección del viento.</dd>
       <dt>Rolar</dt><dd>Cambiar el viento de dirección.</dd>
       <dt>Sotavento</dt><dd>Lado hacia donde va el viento, opuesto a barlovento.</dd>
@@ -580,21 +583,17 @@ const PARTS=[
  {n:7,name:"Pala del timón",g:"Apéndices",x:62,y:428,d:"Parte del timón que va en el agua y desvía el flujo para girar el barco. Es basculante: se levanta para entrar y salir de la playa."},
  {n:8,name:"Caña",g:"Apéndices",x:150,y:332,d:"Brazo unido a la pala. Moverla hacia la vela hace orzar; moverla hacia ti hace arribar."},
  {n:9,name:"Alargador (stick)",g:"Apéndices",x:236,y:342,d:"Extensión articulada de la caña que permite gobernar sentado en la regala, a barlovento."},
- {n:10,name:"Mástil",g:"Jarcia firme",x:350,y:210,d:"Palo vertical que sostiene las velas. Va encajado en la carlinga de la cubierta y sujeto por el estay y los obenques."},
- {n:11,name:"Estay de proa",g:"Jarcia firme",x:482,y:218,d:"Cable de acero que sujeta el mástil hacia proa. El grátil del foque va a lo largo del estay."},
- {n:12,name:"Obenque",g:"Jarcia firme",x:318,y:262,d:"Cables laterales, uno por banda, que sujetan el mástil hacia los costados. Se fijan a las cadenas en la regala."},
- {n:13,name:"Tope y drizas",g:"Jarcia de labor",x:350,y:46,d:"En el tope del mástil están las roldanas de las drizas: los cabos que sirven para izar la mayor y el foque."},
- {n:14,name:"Vela mayor",g:"Velas",x:262,y:228,d:"Vela principal, envergada en el mástil y la botavara. Es la que más potencia aporta y la que más se trima."},
- {n:15,name:"Sables",g:"Velas",x:196,y:150,d:"Varillas metidas en bolsillos de la mayor. Mantienen la forma de la baluma para que no se doble hacia sotavento."},
- {n:16,name:"Foque",g:"Velas",x:470,y:282,d:"Vela de proa, delante del mástil. Acelera el aire sobre la mayor y ayuda a girar la proa. En el RS Quest es enrollable."},
- {n:17,name:"Catavientos",g:"Velas",x:420,y:170,d:"Hilos en el grátil del foque (y a veces en la baluma de la mayor) que muestran cómo fluye el aire. Indican si la vela está bien trimada."},
- {n:18,name:"Enrollador",g:"Jarcia de labor",x:612,y:316,d:"Tambor en el puño de amura del foque. Tirando de su cabo, el foque se enrolla sobre sí mismo para recogerlo."},
- {n:19,name:"Botavara",g:"Jarcia firme",x:206,y:288,d:"Percha horizontal unida al mástil por el pinzote (articulación). Sujeta el pujamen de la mayor. Cuidado con la cabeza en viradas y trasluchadas."},
- {n:20,name:"Contra (trapa)",g:"Jarcia de labor",x:284,y:328,d:"Aparejo entre la base del mástil y la botavara que impide que esta suba. Tensa la baluma y controla la potencia, sobre todo en largos."},
- {n:21,name:"Cunningham",g:"Jarcia de labor",x:360,y:314,d:"Cabo que tira hacia abajo del puño de amura de la mayor. Tensa el grátil y aplana la vela cuando hay mucho viento."},
- {n:22,name:"Pajarín",g:"Jarcia de labor",x:96,y:290,d:"Cabo que tira del puño de escota de la mayor hacia el extremo de la botavara. Regula la bolsa de la parte baja de la vela."},
- {n:23,name:"Escota de mayor",g:"Jarcia de labor",x:112,y:332,d:"Cabo con poleas que controla el ángulo de la mayor. Cazar la cierra; amollar la abre. Es el principal control de velocidad."},
- {n:24,name:"Escota de foque",g:"Jarcia de labor",x:456,y:336,d:"Dos cabos, uno a cada banda, que controlan el foque. Pasan por un escotero (guía) y se trabaja siempre la de sotavento."}
+ {n:10,name:"Mástil",g:"Arboladura",x:350,y:210,d:"Palo vertical que sostiene las velas. Va encajado en la cubierta, delante de la bañera."},
+ {n:11,name:"Vela mayor",g:"Velas",x:262,y:228,d:"Vela principal, envergada en el mástil y la botavara. Es la que más potencia aporta y la que más se trima."},
+ {n:12,name:"Sables",g:"Velas",x:196,y:150,d:"Varillas metidas en bolsillos de la mayor. Mantienen la forma de la baluma para que no se doble hacia sotavento."},
+ {n:13,name:"Foque",g:"Velas",x:470,y:282,d:"Vela de proa, delante del mástil. Acelera el aire sobre la mayor y ayuda a girar la proa. En el RS Quest es enrollable."},
+ {n:14,name:"Lanitas (catavientos)",g:"Velas",x:420,y:170,d:"Hilos de lana pegados a la vela: en el grátil del foque, uno por cada cara, y en la baluma de la mayor. Muestran cómo fluye el aire e indican si la vela está bien trimada."},
+ {n:15,name:"Enrollador",g:"Jarcia de labor",x:612,y:316,d:"Tambor en el puño de amura del foque. Tirando de su cabo, el foque se enrolla sobre sí mismo para recogerlo."},
+ {n:16,name:"Botavara",g:"Arboladura",x:206,y:288,d:"Percha horizontal unida al mástil por el pinzote (articulación). Sujeta el pujamen de la mayor. Cuidado con la cabeza en viradas y trasluchadas."},
+ {n:17,name:"Contra (trapa)",g:"Jarcia de labor",x:284,y:328,d:"Aparejo entre la base del mástil y la botavara que impide que esta suba. Tensa la baluma y controla la potencia, sobre todo en largos."},
+ {n:18,name:"Pajarín",g:"Jarcia de labor",x:96,y:290,d:"Cabo que tira del puño de escota de la mayor hacia el extremo de la botavara. Regula la bolsa de la parte baja de la vela."},
+ {n:19,name:"Escota de mayor",g:"Jarcia de labor",x:112,y:332,d:"Cabo con poleas que controla el ángulo de la mayor. Cazar la cierra; amollar la abre. Es el principal control de velocidad."},
+ {n:20,name:"Escota de foque",g:"Jarcia de labor",x:456,y:336,d:"Dos cabos, uno a cada banda, que controlan el foque. Pasan por un escotero (guía) y se trabaja siempre la de sotavento."}
 ];
 const svgNS="http://www.w3.org/2000/svg";
 const mkG=document.getElementById('markers');
@@ -645,7 +644,7 @@ bS.onclick=()=>{mode='study';bS.setAttribute('aria-pressed','true');bE.setAttrib
 bE.onclick=()=>{mode='exam';bE.setAttribute('aria-pressed','true');bS.setAttribute('aria-pressed','false');document.getElementById('studyBox').hidden=true;document.getElementById('examBox').hidden=false;startExam()};
 document.getElementById('examSkip').onclick=()=>{if(qi<order.length){markers[order[qi]].classList.add('on');examFb.textContent='Era el '+order[qi]+'.';locked=true;setTimeout(()=>{qi++;nextQ()},1300)}};
 document.getElementById('examReset').onclick=startExam;
-showPart(14);
+showPart(PARTS.find(p=>p.name==="Vela mayor").n);
 
 /* ---------- Simulador de rumbos ---------- */
 const rad=d=>d*Math.PI/180;
@@ -667,17 +666,15 @@ const S={theta:90,tack:'babor',self:false,trim:40};
 const $=id=>document.getElementById(id);
 function rumbo(t){
   if(t<42)return{n:'Proa al viento',board:'Abajo. Sin viento en las velas el barco no avanza.',crew:'Centrada. Prepárate para arribar y salir de la zona muerta.',tip:'Estás en la zona muerta: arriba (aleja la proa del viento) hasta que las velas dejen de flamear.'};
-  if(t<56)return{n:'Ceñida',board:'Toda abajo: es cuando más empuje lateral hay.',crew:'Sentada a barlovento, un poco adelantada; haz banda para llevar el barco plano.',tip:'Gobierna mirando los catavientos del foque. Si los dos fluyen, vas a buen ángulo.'};
-  if(t<80)return{n:'Descuartelar',board:'Tres cuartos abajo.',crew:'A barlovento, centrada.',tip:'Un rumbo rápido y cómodo. Amolla un poco desde la ceñida para coger velocidad.'};
-  if(t<101)return{n:'Través',board:'A media altura.',crew:'A barlovento, centrada.',tip:'El viento entra perpendicular al barco. Es el rumbo de la posición de seguridad.'};
-  if(t<141)return{n:'Largo',board:'Un cuarto abajo.',crew:'Algo retrasada para que la proa no se clave.',tip:'El rumbo más rápido. Contra tensa para que la botavara no suba. Buen momento para el gennaker.'};
-  if(t<170)return{n:'Aleta',board:'Casi arriba.',crew:'Retrasada; cambia de banda si el barco escora a barlovento.',tip:'El viento entra por la aleta (el lateral de la popa). Cuidado: cerca de la popa la botavara puede cruzar.'};
+  if(t<68)return{n:'Ceñida',board:'Toda abajo: es cuando más empuje lateral hay.',crew:'Sentada a barlovento, un poco adelantada; haz banda para llevar el barco plano.',tip:'Gobierna mirando las lanitas del foque. Si los dos fluyen, vas a buen ángulo.'};
+  if(t<113)return{n:'Través',board:'A media altura.',crew:'A barlovento, centrada.',tip:'El viento entra perpendicular al barco. Es el rumbo de la posición de seguridad.'};
+  if(t<168)return{n:'Largo',board:'Un cuarto abajo.',crew:'Algo retrasada para que la proa no se clave.',tip:'El rumbo más rápido. Contra tensa para que la botavara no suba. Buen momento para el gennaker.'};
   return{n:'Popa',board:'Casi toda arriba, deja un trozo para mantener el rumbo.',crew:'Atrás y repartida a las dos bandas.',tip:'Riesgo de trasluchada involuntaria. Puedes abrir el foque a la banda contraria: orejas de burro.'};
 }
 function optimal(t){if(t<42)return null;return Math.max(6,Math.min(88,(t-30)/150*86))}
 function speed(t,trimErr){
   if(t<42)return 0.04;
-  const base=t<56?0.55:t<80?0.78:t<101?0.88:t<141?1:t<170?0.8:0.62;
+  const base=t<68?0.6:t<113?0.88:t<168?1:0.62;
   return Math.max(0.08,base*(1-Math.min(Math.abs(trimErr),45)/60));
 }
 function render(){
@@ -689,10 +686,10 @@ function render(){
   let state,cls,err=0;
   if(opt===null){state='Las velas flamean: no hay empuje.';cls='bad'}
   else{err=boomA-opt;
-    if(t>=170&&boomA>=80){state='Vela abierta al máximo. Correcto en popa.';cls='good';err=0}
+    if(t>=168&&boomA>=80){state='Vela abierta al máximo. Correcto en popa.';cls='good';err=0}
     else if(err>12){state='Muy amollada: el grátil flamea. Caza escota.';cls='warn'}
     else if(err<-12){state='Sobrecazada: el barco escora y frena. Amolla escota.';cls='warn'}
-    else{state='Bien trimada: catavientos fluyendo.';cls='good'}}
+    else{state='Bien trimada: las lanitas fluyen.';cls='good'}}
   // barco
   const rot=side*t;
   $('boatTop').setAttribute('transform','rotate('+rot+')');
@@ -708,7 +705,7 @@ function render(){
   $('main').style.strokeDasharray=luff?'4 3':'none';
   // foque
   const jb=t<42?0:Math.min(78,boomA*0.85+4),jl=40,jx=0,jy=-60;
-  const jside=(t>=170&&S.self===false)?-side:side; // orejas de burro en popa
+  const jside=(t>=168&&S.self===false)?-side:side; // orejas de burro en popa
   const ja=rad(jb),jcx=jx+jside*jl*Math.sin(ja),jcy=jy+jl*Math.cos(ja);
   const jnx=jside*Math.cos(ja),jny=-Math.sin(ja);
   $('jib').setAttribute('d','M'+jx+' '+jy+' Q'+((jx+jcx)/2+jnx*(luff?2:9)).toFixed(1)+' '+((jy+jcy)/2+jny*(luff?2:9)).toFixed(1)+' '+jcx.toFixed(1)+' '+jcy.toFixed(1)+' Z');
@@ -716,23 +713,24 @@ function render(){
   // tripulación: barlovento = lado contrario a la vela
   const wind=-side;
   const cy1=t>=141?24:t<56?4:12;
-  if(t>=170){$('crew1').setAttribute('cx',14);$('crew2').setAttribute('cx',-14)}
+  if(t>=168){$('crew1').setAttribute('cx',14);$('crew2').setAttribute('cx',-14)}
   else{$('crew1').setAttribute('cx',wind*17);$('crew2').setAttribute('cx',wind*15)}
   $('crew1').setAttribute('cy',cy1+16);$('crew2').setAttribute('cy',cy1);
   // textos
   const r=rumbo(t);
   $('rumboName').textContent=r.n;
-  $('amuraTxt').textContent=t>=170?'Viento por la popa':'Amurado a '+S.tack;
-  $('amuraTxt').style.color=t>=170?'var(--sea)':(S.tack==='babor'?'var(--port)':'var(--stbd)');
+  $('amuraTxt').textContent=t>=168?'Viento por la popa':'Amurado a '+S.tack;
+  $('amuraTxt').style.color=t>=168?'var(--sea)':(S.tack==='babor'?'var(--port)':'var(--stbd)');
   $('angleVal').textContent=t+'°';$('angle').value=t;
   $('trim').value=S.trim;$('trimVal').textContent=S.trim+'°';
   $('rSail').textContent=opt===null?'Flameando, sin forma.':'Botavara a '+boomA+'° del eje'+(S.self?' (ideal ≈ '+Math.round(opt)+'°)':'')+', en la banda de '+(side===1?'estribor':'babor')+'.';
   $('rTrim').innerHTML='<span class="pill '+cls+'">'+state+'</span>';
+  $('rLan').textContent=opt===null?'Cuelgan o giran sin orden: no hay flujo de aire.':t>=168?'En popa no indican bien: guíate por la grímpola.':err>12?'Gira la de barlovento del foque: caza o arriba.':err<-12?'Gira la de sotavento del foque: amolla u orza.':'Las dos lanitas del foque fluyen rectas hacia atrás.';
   $('rBoard').textContent=r.board;$('rCrew').textContent=r.crew;$('rTip').textContent=r.tip;
   $('rSpeed').style.width=Math.round(speed(t,err)*100)+'%';
   document.querySelectorAll('#quickBtns button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.a===t)));
 }
-[['Ceñida',45],['Descuartelar',65],['Través',90],['Largo',130],['Aleta',155],['Popa',180]].forEach(([n,a])=>{
+[['Ceñida',45],['Través',90],['Largo',135],['Popa',180]].forEach(([n,a])=>{
   const b=document.createElement('button');b.className='btn';b.textContent=n;b.dataset.a=a;
   b.onclick=()=>{S.theta=a;render()};$('quickBtns').append(b)});
 $('angle').addEventListener('input',e=>{S.theta=+e.target.value;render()});
@@ -746,23 +744,23 @@ render();
 /* ---------- Test ---------- */
 const Q=[
  {q:"¿Cómo se llama el lado izquierdo del barco mirando hacia proa?",o:["Estribor","Babor","Barlovento","Sotavento"],a:1,w:"Babor a la izquierda (luz roja), estribor a la derecha (luz verde)."},
- {q:"¿Qué elemento evita que el barco se desplace de lado?",o:["El timón","La contra","La orza","El cunningham"],a:2,w:"La orza se opone al abatimiento, el desplazamiento lateral."},
- {q:"Los cables de acero que sujetan el mástil hacia los lados son…",o:["Obenques","Drizas","Escotas","Sables"],a:0,w:"Los obenques forman parte de la jarcia firme junto con el estay."},
- {q:"¿Para qué sirve la driza?",o:["Para trimar la vela","Para izar la vela","Para subir la orza","Para tensar la baluma"],a:1,w:"La driza iza la vela hasta el tope del mástil."},
+ {q:"¿Qué elemento evita que el barco se desplace de lado?",o:["El timón","La contra","La orza","La botavara"],a:2,w:"La orza se opone al abatimiento, el desplazamiento lateral."},
+ {q:"¿Dónde se colocan las lanitas en un RS?",o:["En la orza y el timón","En el grátil del foque y en la baluma de la mayor","En la botavara","En las escotas"],a:1,w:"En el foque hay una por cada cara del grátil; en la mayor, al final de los sables."},
+ {q:"¿Para qué sirve la driza?",o:["Para trimar la vela","Para izar la vela","Para subir la orza","Para tensar la baluma"],a:1,w:"La driza sube la vela hasta lo alto del mástil."},
  {q:"La esquina inferior trasera de la mayor es el…",o:["Puño de driza","Puño de amura","Puño de escota","Grátil"],a:2,w:"El puño de escota queda al final de la botavara y sobre él tira el pajarín."},
  {q:"El borde de la vela que va unido al mástil se llama…",o:["Baluma","Pujamen","Grátil","Sable"],a:2,w:"Grátil: borde de ataque. Baluma: borde de salida. Pujamen: borde inferior."},
  {q:"¿Qué control impide que la botavara suba?",o:["La contra","El pajarín","La escota de foque","El enrollador"],a:0,w:"La contra (o trapa) tira de la botavara hacia abajo."},
  {q:"Navegar lo más cerca posible del viento (≈45°) es…",o:["Través","Largo","Ceñida","Popa"],a:2,w:"En ceñida las velas van muy cazadas y la orza toda abajo."},
- {q:"¿En qué rumbo el viento entra perpendicular al barco?",o:["Ceñida","Través","Aleta","Popa"],a:1,w:"Través: 90° respecto al viento."},
+ {q:"¿En qué rumbo el viento entra perpendicular al barco?",o:["Ceñida","Través","Largo","Popa"],a:1,w:"Través: 90° respecto al viento."},
  {q:"Si el viento entra por estribor, vamos…",o:["Amurados a babor","Amurados a estribor","De popa","En la zona muerta"],a:1,w:"La amura es el costado por el que entra el viento. La botavara irá a babor."},
  {q:"Empujar la caña hacia la vela hace que el barco…",o:["Arribe","Orce","Se pare","Trasluche"],a:1,w:"Caña hacia la vela (sotavento) = orzar, la proa se acerca al viento."},
  {q:"En popa, ¿cómo llevamos la orza?",o:["Toda abajo","A media altura","Casi arriba","Da igual"],a:2,w:"En popa casi no hay empuje lateral, así que la orza sube para reducir rozamiento."},
  {q:"Si el grátil de la vela flamea, debemos…",o:["Cazar escota o arribar","Amollar más","Subir la orza","Soltar la contra"],a:0,w:"Flamear indica vela demasiado abierta para el rumbo: caza o aleja la proa del viento."},
  {q:"¿Qué maniobra cambia de amura pasando la popa por el viento?",o:["Virada por avante","Trasluchada","Orzada","Posición de seguridad"],a:1,w:"En la trasluchada la botavara cruza con fuerza: cabezas abajo."},
  {q:"Para parar el barco en el agua de forma segura…",o:["Me pongo en popa y cazo","Me pongo de través y amollo las escotas","Subo la orza del todo","Suelto el timón"],a:1,w:"De través o algo más cerrado, con las escotas sueltas, las velas flamean y el barco se detiene."},
- {q:"Cae el cataviento de sotavento del foque. ¿Qué haces?",o:["Cazo el foque","Amollo o orzo un poco","Arribo mucho","Nada, está bien"],a:1,w:"Cataviento de sotavento caído: vela sobrecazada o rumbo muy arribado."},
+ {q:"Gira la lanita de sotavento del foque. ¿Qué haces?",o:["Cazo el foque","Amollo u orzo un poco","Arribo mucho","Nada, está bien"],a:1,w:"Cataviento de sotavento caído: vela sobrecazada o rumbo muy arribado."},
  {q:"¿Qué es barlovento?",o:["El lado por donde viene el viento","El lado hacia donde va el viento","La parte trasera del barco","Un tipo de vela"],a:0,w:"La tripulación se sienta a barlovento para compensar la escora."},
- {q:"¿Para qué sirve el cunningham?",o:["Para izar el foque","Para tensar el grátil de la mayor y aplanarla","Para sujetar el timón","Para enrollar el foque"],a:1,w:"Se usa con viento fuerte para quitar potencia a la vela."}
+ {q:"Gira la lanita de barlovento del foque. ¿Qué haces?",o:["Amollo la escota","Cazo la escota o arribo un poco","Subo la orza","Nada, está bien"],a:1,w:"Lanita de barlovento girando: vas demasiado orzado o la vela está muy abierta."}
 ];
 let correct=0,answered=0;
 function buildQuiz(){
